@@ -1,0 +1,35 @@
+<!-- File: src/main/resources/templates/comment.html -->
+<div th:fragment="commentFragment(comment)" xmlns:sec="http://www.w3.org/1999/xhtml">
+    <div class="comment-box" style="margin-left: 20px; border-left: 1px solid #ccc; padding-left: 10px; margin-top: 10px;">
+        <p>
+            <strong th:text="${comment.authorUsername != null ? comment.authorUsername : 'Unknown'}"></strong> commented:
+        </p>
+        <p>
+            <span style="font-size: 0.9em; color: gray;"
+                  th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">
+                Timestamp
+            </span>
+        </p>
+
+        <p th:text="${comment.content}">Comment content</p>
+
+        <!-- Reply form (shown only to authenticated users) -->
+        <div sec:authorize="isAuthenticated()">
+            <form th:action="@{/comments/add}" method="post" style="margin-top: 8px;">
+                <input type="hidden" name="bookId" th:value="${comment.bookId}" />
+                <input type="hidden" name="parentCommentId" th:value="${comment.id}" />
+                <input type="hidden" name="username" th:value="${#authentication.name}" />
+                <textarea name="content" rows="2" cols="40" placeholder="Reply to this comment..." required></textarea>
+                <br/>
+                <button type="submit" style="margin-top: 4px;">Reply</button>
+            </form>
+
+        </div>
+
+        <!-- Recursive replies -->
+        <div th:if="${comment.replies != null and !#lists.isEmpty(comment.replies)}">
+            <div th:each="childComment : ${comment.replies}"
+                 th:replace="comment :: commentFragment(${childComment})"></div>
+        </div>
+    </div>
+</div>

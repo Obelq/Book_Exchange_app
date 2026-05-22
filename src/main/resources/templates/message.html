@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 1rem;
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        .chat-box {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            max-width: 600px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+        }
+
+        .sent {
+            text-align: right;
+            background-color: #dcf8c6;
+            padding: 0.5rem;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .received {
+            text-align: left;
+            background-color: #eee;
+            padding: 0.5rem;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .timestamp {
+            font-size: 0.75rem;
+            color: gray;
+        }
+
+        .unread {
+            font-weight: bold;
+        }
+
+        .read {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<h2>Message Center</h2>
+
+<form th:action="@{/messages/send}" method="post">
+    <input type="hidden" id="bookId" name="bookId" th:value="${bookId}" />
+
+    <label for="senderUsername">Sender:</label>
+    <input type="text" id="senderUsername" name="senderUsername" th:value="${senderUsername}" required />
+
+    <label for="receiverUsername">Receiver:</label>
+    <input type="text" id="receiverUsername" name="receiverUsername" th:value="${receiverUsername}" required />
+
+    <label for="messageContent">Message:</label>
+    <textarea id="messageContent" name="messageContent" required></textarea>
+
+    <button type="submit">Send</button>
+</form>
+
+<!-- Success/Error messages -->
+<div th:if="${success}">
+    <p>✅ Message sent successfully!</p>
+</div>
+<div th:if="${error}">
+    <p>❌ Error sending message. Please try again.</p>
+</div>
+
+<!-- Display previous messages if available -->
+<div th:if="${messages}">
+    <div class="chat-box">
+        <div th:each="msg : ${messages}" class="message">
+            <div th:class="${msg.sender.username == senderUsername} ? 'sent' : 'received'">
+                <p th:text="${msg.content}">[Content]</p>
+                <div class="timestamp">
+                    <span th:text="${#temporals.format(msg.sentAt, 'yyyy-MM-dd HH:mm')}">[Timestamp]</span>
+                    <span th:if="${!msg.read}" class="unread"> (Unread)</span>
+                </div>
+            </div>
+
+            <form th:if="${!msg.read and msg.receiver.username == senderUsername}"
+                  th:action="@{'/messages/mark-read/' + ${msg.id}(bookId=${bookId})}"
+                  method="post" style="display: inline;">
+                <input type="hidden" name="_method" value="put"/>
+                <button type="submit">Mark as Read</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

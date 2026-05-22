@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        nav ul li {
+            margin: 8px 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .book-list {
+            margin-top: 20px;
+        }
+
+        .book-item {
+            border: 1px solid #ccc;
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .logout {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Welcome, <span th:text="${user.username}">User</span> 👋</h1>
+
+<!-- Navigation Links -->
+<nav>
+    <ul>
+        <li><a th:href="@{/books/new}">➕ Add New Book</a></li>
+        <li><a th:href="@{/books/search}">🔍 Search Books</a></li>
+        <li><a th:href="@{/messages/user(username=${user.username})}">💬 My Messages</a></li>
+
+        <li><a th:href="@{/comments/user/{userId}(userId=${user.id})}">📝 My Comments</a></li>
+
+        <li><a th:href="@{/statistics}">📊 View Statistics</a></li>
+        <li>
+            <form th:action="@{/auth/logout}" method="post" style="display: inline;">
+                <button type="submit" style="border: none; background: none; padding: 0; font-weight: bold; color: #007BFF; text-decoration: underline;">🚪 Logout</button>
+            </form>
+        </li>
+
+    </ul>
+</nav>
+
+<!-- Book Section -->
+<div class="book-list">
+    <h2>Your Books</h2>
+    <div th:if="${books.isEmpty()}">
+        <p>You don't have any books yet.</p>
+    </div>
+    <div th:each="book : ${books}" class="book-item">
+        <strong th:text="${book.title}">Book Title</strong><br/>
+        <span th:text="'Author: ' + ${book.author}">Author</span><br/>
+        <span th:text="'Status: ' + ${book.status}">Status</span>
+    </div>
+</div>
+
+</body>
+</html>

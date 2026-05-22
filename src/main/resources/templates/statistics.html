@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Statistics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        .stat-box {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+<h1>System Statistics</h1>
+
+<div class="stat-box">
+    <p><strong>Total Users:</strong> <span th:text="${totalUsers}"></span></p>
+    <p><strong>Total Books:</strong> <span th:text="${totalBooks}"></span></p>
+    <p><strong>Available Books:</strong> <span th:text="${availableBooks}"></span></p>
+    <p><strong>Reserved Books:</strong> <span th:text="${reservedBooks}"></span></p>
+    <p><strong>Borrowed Books:</strong> <span th:text="${borrowedBooks}"></span></p>
+</div>
+
+<p><a th:href="@{/dashboard}">Back to Dashboard</a></p>
+</body>
+</html>

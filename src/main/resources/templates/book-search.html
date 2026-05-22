@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .search-form, .results {
+            margin-bottom: 20px;
+        }
+        label {
+            margin-right: 15px;
+        }
+        input[type="text"], select {
+            padding: 5px;
+            margin-left: 5px;
+        }
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+        .book-item {
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .book-item strong {
+            font-size: 1.2em;
+        }
+        .book-item a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .book-item a:hover {
+            text-decoration: underline;
+        }
+        .no-results {
+            font-style: italic;
+            color: #666;
+        }
+        .nav-links {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav-links">
+    <a th:href="@{/dashboard}">← Back to Dashboard</a>
+</div>
+
+<h1>Search Books</h1>
+
+<form class="search-form" th:action="@{/books/search}" method="get">
+    <label>
+        Title:
+        <input type="text" name="title" placeholder="Search by title" th:value="${param.title}" />
+    </label>
+    <label>
+        Author:
+        <input type="text" name="author" placeholder="Search by author" th:value="${param.author}" />
+    </label>
+    <label>
+        Status:
+        <select name="status" th:value="${param.status}">
+            <option value="">-- Any Status --</option>
+            <option value="AVAILABLE" th:selected="${param.status == 'AVAILABLE'}">Available</option>
+            <option value="BORROWED" th:selected="${param.status == 'BORROWED'}">Borrowed</option>
+            <option value="RESERVED" th:selected="${param.status == 'RESERVED'}">Reserved</option>
+            <option value="SOLD" th:selected="${param.status == 'SOLD'}">Sold</option>
+        </select>
+    </label>
+    <button type="submit">Search</button>
+</form>
+
+<div class="results">
+    <h2>Results</h2>
+
+    <div th:if="${#lists.isEmpty(books)}" class="no-results">
+        <p>No books found.</p>
+    </div>
+
+    <div th:each="book : ${books}" class="book-item">
+        <strong>
+            <a th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">Book Title</a>
+        </strong><br/>
+        <span th:text="'Author: ' + ${book.author}">Author</span><br/>
+        <span th:text="'Status: ' + ${book.status}">Status</span>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${book.title} + ' - Details'">Book Details</title>
+    <meta charset="UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .comment { margin-bottom: 1rem; }
+        .reply { margin-left: 2rem; }
+        .comment-box { background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; }
+        .comment-form textarea { resize: vertical; }
+        .timestamp { font-size: 0.8rem; color: #6c757d; }
+    </style>
+</head>
+<body class="container mt-4">
+
+<h1 th:text="${book.title}">Book Title</h1>
+<p><strong>Author:</strong> <span th:text="${book.author}">Author</span></p>
+
+<hr/>
+
+<h3>Add a Comment</h3>
+
+<div sec:authorize="isAuthenticated()" class="mb-4">
+    <form th:action="@{/comments/add}" method="post" class="comment-form">
+        <input type="hidden" name="bookId" th:value="${book.id}">
+        <input type="hidden" name="username" th:value="${#authentication.name}">
+        <div class="mb-3">
+            <textarea name="content" class="form-control" rows="3" placeholder="Leave a comment..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+</div>
+
+<div sec:authorize="!isAuthenticated()" class="alert alert-info">
+    <p>You must <a th:href="@{/login}">log in</a> to add a comment.</p>
+</div>
+
+<hr/>
+
+<h3>Comments</h3>
+
+<div th:if="${#lists.isEmpty(comments)}" class="text-muted">
+    <p>No comments yet. Be the first to comment!</p>
+</div>
+
+<div th:each="comment : ${comments}" class="comment">
+    <div class="comment-box">
+        <p><strong th:text="${comment.authorUsername}">[Author]</strong></p>
+        <p th:text="${comment.content}">[Content]</p>
+        <p class="timestamp" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">[Timestamp]</p>
+    </div>
+
+    <div sec:authorize="isAuthenticated()" class="reply mt-2">
+        <form th:action="@{/comments/add}" method="post" class="comment-form">
+            <input type="hidden" name="bookId" th:value="${book.id}">
+            <input type="hidden" name="parentCommentId" th:value="${comment.id}">
+            <input type="hidden" name="username" th:value="${#authentication.name}">
+            <div class="mb-2">
+                <textarea name="content" class="form-control" rows="2" placeholder="Reply..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
+        </form>
+    </div>
+
+    <!-- Nested Replies -->
+    <div th:each="reply : ${comment.replies}" class="reply comment mt-2">
+        <div class="comment-box">
+            <p><strong th:text="${reply.authorUsername}">[Reply Author]</strong></p>
+            <p th:text="${reply.content}">[Reply Content]</p>
+            <p class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">[Timestamp]</p>
+        </div>
+
+        <div sec:authorize="isAuthenticated()" class="reply mt-2">
+            <form th:action="@{/comments/add}" method="post" class="comment-form">
+                <input type="hidden" name="bookId" th:value="${book.id}">
+                <input type="hidden" name="parentCommentId" th:value="${reply.id}">
+                <input type="hidden" name="username" th:value="${#authentication.name}">
+                <div class="mb-2">
+                    <textarea name="content" class="form-control" rows="2" placeholder="Reply..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-sm btn-secondary">Reply</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
